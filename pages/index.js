@@ -1,22 +1,5 @@
-import { MongoClient } from 'mongodb';
+import Head from 'next/head';
 import MeetupList from '../components/meetups/MeetupList';
-
-const DUMMY_MEETUPS = [
-  {
-    id: 'm1',
-    title: 'First Meetup',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/2/21/13-08-08-hongkong-by-RalfR-088.jpg',
-    address: '123 Main St, New York, NY',
-    description: 'This is our first meetup.',
-  },
-  {
-    id: 'm2',
-    title: 'Second Meetup',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/2/21/13-08-08-hongkong-by-RalfR-088.jpg',
-    address: '456 Broadway, New York, NY',
-    description: 'This is our second meetup.',
-  },
-];
 
 export async function getStaticProps() {
   const client = await MongoClient.connect('mongodb+srv://allforfre1:zaid@1999@cluster0.wnhgn5z.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
@@ -40,5 +23,17 @@ export async function getStaticProps() {
   };
 }
 
-
-
+export default function HomePage({ meetups }) {
+  return (
+    <>
+      <Head>
+        <title>Meetups website</title>
+        <meta
+          name="description"
+          content="Explore a wide range of meetups happening near you. Join interesting communities and connect with like-minded individuals."
+        />
+      </Head>
+      <MeetupList meetups={meetups} />
+    </>
+  );
+}

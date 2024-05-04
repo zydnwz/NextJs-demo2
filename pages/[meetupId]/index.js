@@ -1,12 +1,15 @@
 import { Fragment } from 'react';
-import MeetupDetail from '../../components/meetups/MeetupDetail';
 import { MongoClient, ObjectId } from 'mongodb';
+import Head from 'next/head';
+import MeetupDetail from '../../components/meetups/MeetupDetail';
 
-function MeetupDetailPage(props) {
-  const { meetupData } = props;
-
+export default function MeetupDetailPage({ meetupData }) {
   return (
     <Fragment>
+      <Head>
+        <title>{meetupData.title} | meetup website</title>
+        <meta name="description" content={meetupData.description} />
+      </Head>
       <MeetupDetail
         image={meetupData.image}
         title={meetupData.title}
@@ -52,5 +55,3 @@ export async function getStaticProps(context) {
     }
   };
 }
-
-export default MeetupDetailPage;

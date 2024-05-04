@@ -16,8 +16,6 @@ export default async function handler(req, res) {
       description,
     });
 
-    console.log(result);
-
     client.close();
 
     res.status(201).json({ message: 'Meetup inserted!' });
