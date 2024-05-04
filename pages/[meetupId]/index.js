@@ -1,47 +1,56 @@
 import { Fragment } from 'react';
 import MeetupDetail from '../../components/meetups/MeetupDetail';
+import { MongoClient, ObjectId } from 'mongodb';
 
-function MeetupDetailPage() {
+function MeetupDetailPage(props) {
+  const { meetupData } = props;
+
   return (
     <Fragment>
       <MeetupDetail
-        image="https://upload.wikimedia.org/wikipedia/commons/2/21/13-08-08-hongkong-by-RalfR-088.jpg"
-        title="First Meetup"
-        address="Some Street 5, Some City"
-        description="This is a first meetup."
+        image={meetupData.image}
+        title={meetupData.title}
+        address={meetupData.address}
+        description={meetupData.description}
       />
     </Fragment>
   );
 }
 
 export async function getStaticPaths() {
-    return {
+  const client = await MongoClient.connect('mongodb+srv://allforfre1:zaid@1999@cluster0.wnhgn5z.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
+  const db = client.db();
+  const meetupsCollection = db.collection('meetups');
+  const meetups = await meetupsCollection.find({}, { projection: { _id: 1 } }).toArray();
+  client.close();
 
-      fallback: false,
-      paths: [
-        { params: { meetupId: 'm1' } },
-        { params: { meetupId: 'm2' } },
-        { params: { meetupId: 'm3' } } 
-      ]
-    };
-  }
+  return {
+    fallback: false,
+    paths: meetups.map(meetup => ({
+      params: { meetupId: meetup._id.toString() }
+    }))
+  };
+}
 
 export async function getStaticProps(context) {
-    const meetupId = context.params.meetupId;
-    console.log(meetupId);
+  const meetupId = context.params.meetupId;
+  const client = await MongoClient.connect('mongodb+srv://allforfre1:zaid@1999@cluster0.wnhgn5z.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
+  const db = client.db();
+  const meetupsCollection = db.collection('meetups');
+  const selectedMeetup = await meetupsCollection.findOne({ _id: ObjectId(meetupId) });
+  client.close();
 
-    return {
-      props: {
-        meetupData:{
-            image:'https://upload.wikimedia.org/wikipedia/commons/2/21/13-08-08-hongkong-by-RalfR-088.jpg',
-            id: 'm1',
-            title: 'First Meetup',
-            address: '123 Main St, New York, NY',
-            description: 'This is our first meetup.',
-        }
-      },
-      revalidate: 10 
-    };
-  }
+  return {
+    props: {
+      meetupData: {
+        id: selectedMeetup._id.toString(),
+        title: selectedMeetup.title,
+        address: selectedMeetup.address,
+        image: selectedMeetup.image,
+        description: selectedMeetup.description
+      }
+    }
+  };
+}
 
 export default MeetupDetailPage;
